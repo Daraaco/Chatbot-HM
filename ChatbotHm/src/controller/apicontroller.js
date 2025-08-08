@@ -21,28 +21,33 @@ const sendmessage = require("../service/apiservice");
  */
 const verify = (req, res) => {
     try {
-        // Token de verificación configurado en tu app de Meta for Developers
-        // IMPORTANTE: Este token debe coincidir con el configurado en Meta
-        const tokenhm = "HMVERIFYTOKENAPI";
-        
         // Extraer parámetros de la petición de verificación
         const token = req.query["hub.verify_token"];      // Token enviado por Meta
         const challenge = req.query["hub.challenge"];     // Código de desafío a devolver
 
-        // Verificar que ambos parámetros existen y el token coincide
-        if (challenge && token && token === tokenhm) {
-            // Verificación exitosa: devolver el challenge
-            res.send(challenge);
-            console.log('Webhook verificado correctamente');
-        } else {
-            // Verificación fallida: devolver error 400
-            console.log('Error en verificación de webhook - Token incorrecto');
-            res.status(400).send();
+        // Token de verificación configurado en tu app de Meta for Developers
+        // IMPORTANTE: Este token debe coincidir con el configurado en Meta
+        const tokenhm = process.env.VERIFY_TOKEN;
+        if (!tokenhm) {
+            throw new Error('Error: VERIFY_TOKEN no está configurado en las variables de entorno');
         }
+        
+        // Verificar que ambos parámetros existen y el token coincide
+        const isValid = token 
+            && challenge 
+            && (token === tokenhm);
+        if (!isValid) {
+            // Verificación fallida: devolver error 400
+            throw new Error('Error en verificación de webhook - Token incorrecto');
+        }
+
+        return res.send(challenge);
     } catch (error) {
         // Manejar cualquier error durante la verificación
         console.error('Error en verify:', error);
-        res.status(400).send();
+        return res
+            .status(400)
+            .json({ message: error?.message });
     }
 };
 
@@ -72,12 +77,23 @@ const verify = (req, res) => {
  */
 const received = (req, res) => {
     try {
+        // VERIFICACIÓN DE TOKEN EN HEADER
+        const token = req.headers['x-verify-token'];
+        const tokenhm = process.env.VERIFY_TOKEN;
+        if (!tokenhm) {
+            throw new Error('Error: VERIFY_TOKEN no está configurado en las variables de entorno');
+        }
+        if (!token || token !== tokenhm) {
+            throw new Error('Error en verificación de evento - Token incorrecto');
+        }
+
         // VALIDACIÓN INICIAL DEL PAYLOAD
-        // Verificar que el body contiene la estructura esperada
         if (!req.body || !req.body.entry || !req.body.entry.length) {
             console.log('Evento recibido sin datos válidos');
             return res.send("EVENT_RECEIVED");
         }
+
+        // ...resto del código existente...
 
         // EXTRAER DATOS DEL EVENTO
         // WhatsApp envía eventos en un array, tomamos el primero

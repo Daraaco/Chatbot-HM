@@ -4,11 +4,14 @@ const https = require('https');
  * CONFIGURACIÓN DE CREDENCIALES
  * Configuración de tokens y IDs para la API de WhatsApp Business
  */
-const ACCESS_TOKEN = 'EAASCqIKgkHcBPBTgRPm33nDCNpv2O2XycAbMdsnYAy3Wu6K8BAuod9yzKStMwSXweTNMiBnbrGf38uIEcNOIkZCfMDhXX0Dxk7MAHn0cwmCrPp7F05oNX8XlvvJvYbApuwqp3HJluYwPSS97rZCDjSpUOgjVUJ2jColzOPPTmkjr0uwOeuEUpMAuVJog75WqxueRvf8GULVtsPOrtxbCXR3DR3OyfjJ8EqRC5nQX47igZDZD';
-const PHONE_NUMBER_ID = '688806624322026';
+require('dotenv').config();
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+
 
 /**
  * INFORMACIÓN DE LA EMPRESA HM INSURANCE BROKERS
+ * Información general de la empresa, horarios, oficinas y asesores
  */
 const COMPANY_INFO = {
     name: 'HM Insurance Brokers',
